@@ -1,8 +1,27 @@
+import { redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { db } from "~/utils/db.server";
+
+export async function action({ request }: ActionFunctionArgs) {
+  const form = await request.formData();
+
+  const content = form.get("content");
+  const name = form.get("name");
+
+  if (typeof content !== "string" || typeof name !== "string")
+    throw new Error("Invalid form input");
+
+  const fields = { content, name };
+  const joke = await db.joke.create({
+    data: fields,
+  });
+  return redirect(`/jokes/${joke.id}`);
+}
+
 export default function JokesNew() {
   return (
     <div>
       <p>Add your hilarious joke</p>
-      <form action="" method="post">
+      <form method="post">
         <div>
           <label>
             Name: <input type="text" name="name" />
